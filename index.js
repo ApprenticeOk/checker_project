@@ -19,7 +19,7 @@ app.get('/checkerbb', (req, res) => {
         api_tag: 'apibb',
         limiter: 300,
         test_speed: 250,
-        checker_css_em: '8.9em'
+        checker_css_em: '9em'
     });
 });
 
@@ -29,7 +29,7 @@ app.get('/checkersicredi', (req, res) => {
         api_tag: 'apisicredi',
         limiter: 200,
         test_speed: 400,
-        checker_css_em: '7.9em'
+        checker_css_em: '8em'
     });
 });
 
