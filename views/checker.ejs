@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title id="title">
+      #AllowFind
+   </title>
+   <link rel="shortcut icon" href="assets/img/face.png">
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+   <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css"
+      rel="stylesheet">
+   <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+   <link href="assets/plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css">
+   <link rel="stylesheet" href="styles/plugins/c3.css">
+   <link rel="stylesheet" href="styles/plugins/waves.css">
+   <link rel="stylesheet" href="styles/plugins/perfect-scrollbar.css">
+   <link rel="stylesheet" href="styles/bootstrap.min.css">
+   <link rel="stylesheet" href="styles/main.min.css">
+   <style>
+      body {
+         overflow-x: hidden;
+         font-family: "Special Elite", monospace;
+      }
+
+      #top-bar {
+         background-color: #212F3C;
+         width: 100%;
+         height: 60px;
+         background-color: #212F3C;
+         position: relative;
+         top: -20px;
+      }
+
+      #title-top-bar {
+         position: relative;
+         top: 5px;
+         color: white;
+         font-weight: bold;
+         left: 55px;
+      }
+
+      #logo-top-bar {
+         width: 60px;
+         position: relative;
+         top: -50px;
+      }
+
+      .line {
+         border-right: 2px solid rgba(255, 255, 255, 0.75);
+         color: rgba(255, 255, 255, 0.75);
+         margin: 0 auto;
+         white-space: nowrap;
+         overflow: hidden;
+      }
+
+      .typing-animation {
+         animation: blinkCursor 500ms steps(40) infinite normal,
+            typing 4s steps(40) 1s normal both;
+      }
+
+      @keyframes typing {
+         from {
+            width: 0;
+         }
+
+         to {
+            width: <%=checker_css_em%>;
+         }
+      }
+
+      @keyframes blinkCursor {
+         from {
+            border-right-color: rgba(255, 255, 255, 0.75);
+         }
+
+         to {
+            border-right-color: transparent;
+         }
+      }
+   </style>
+   <script>
+      $(function () {
+         $('[data-toggle="tooltip"]').tooltip()
+      })
+      $(document).ready(function () {
+         $("#seconds").click(function () {
+            seconds = $("#seconds").val().replace("00:00", "");
+         });
+      });
+
+      seconds = $("#seconds").val();
+      const totalCarregamento = async function (qtd, only = false) {
+         if (only)
+            return $("#countTotal")[0].textContent = qtd
+
+         const value = parseInt($("#countTotal")[0].textContent) + qtd;
+         $("#countTotal")[0].textContent = value
+      }
+
+      const moreOne = async function (elementId) {
+         const element = $(`#${elementId}`)[0];
+         var value = parseInt(element.textContent);
+         element.textContent = value + 1;
+      }
+
+      const accountLive = async function (value) {
+         $("#listaprovadas").append(value + "<br>");
+         moreOne("countLives");
+         moreOne("countChecked");
+      }
+
+      const accountLivePlus = async function (value) {
+         $("#listaprovadasplus").append(value + "<br>");
+         moreOne("countLives");
+         moreOne("countChecked");
+      }
+
+      const accountDie = async function (value) {
+         $("#listreprovadas").append(value + "<br>");
+         moreOne("countDies");
+         moreOne("countChecked");
+      }
+
+      const accountError = async function (value) {
+         moreOne("countError");
+         moreOne("countChecked");
+      }
+
+      const clearList = async function (verify, value) {
+         if (verify && value == 10)
+            $("#lista")[0].value = "";
+      }
+
+      function sleep(ms) {
+         return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+      const esconder = async function (type) {
+         var value = $(`.${type}`)[0].style.display;
+         $(`.${type}`)[0].style.display = value ? "" : "none";
+      }
+
+      const copiarlist = async function (type) {
+         var copyText = $(`.${type}`)[0]
+         window.getSelection().selectAllChildren(copyText);
+         document.execCommand("copy");
+      }
+
+      const resetChecker = function () {
+         $("#countChecked")[0].textContent[0] = "0";
+         $("#countTotal")[0].textContent[0] = "0";
+         $("#countLives")[0].textContent[0] = "0";
+         $("#countDies")[0].textContent[0] = "0";
+      }
+
+      const removelinha = function () {
+         var lines = $("#lista").val().split('\n');
+         lines.splice(0, 1);
+         $("#lista").val(lines.join("\n"));
+      }
+
+      const checkar = async function (value) {
+         $.ajax({
+            url: "/<%= api_tag %>?lista=" + value,
+            method: "GET",
+            async: true,
+            contentType: 'application/json',
+            success: function (response) {
+               var testadas = parseInt($("#countChecked")[0].textContent)
+               var total = parseInt($("#countTotal")[0].textContent)
+               if ((total - testadas) <= 2)
+                  $("#start")[0].disabled = false;
+
+               var value = response;
+               if (response.match("#APROVADA")) {
+                  accountLivePlus(value);
+               } else if (response.match("#Aprovada")) {
+                  accountLive(value);
+               } else if (response.match("#Reprovada")) {
+                  accountDie(value)
+               } else {
+                  accountError(value)
+               }
+               removelinha();
+            }
+         })
+      }
+
+      const stop = async function () {
+         $("#start")[0].disabled = false;
+         _continue = false;
+      }
+      var _continue;
+
+      const start = async function (name) {
+         const time = seconds * 1000;
+         console.log(seconds);
+         _continue = true;
+         var values = $("#lista").val()
+
+         var filter = duplicateRemove(values)
+
+         if (!filter.length)
+            return stop();
+
+         $("#lista").text(filter.join("\n"));
+         if (filter.length > <%= limiter %>) return alert("Coloque no maximo <%= limiter %> Linhas. Carregado: ".concat(filter.length))
+         resetChecker()
+         totalCarregamento(filter.length);
+         $("#start")[0].disabled = true;
+
+         for (var i = 0; i < filter.length; i++) {
+            if (!_continue) {
+               break;
+            }
+            var value = filter[i];
+            await sleep(<%= test_speed %>);
+            checkar(value);
+            await sleep(time);
+         }
+      }
+
+      const duplicateRemove = function (text) {
+         var linhas = text.split('\n');
+
+         var newArr = linhas.filter(function (element, i) {
+            return (linhas.indexOf(element) === i && element.length);
+         })
+
+         return newArr.length ? newArr : false;
+      }
+   </script>
+   <script src="scripts/vendors.js"></script>
+   <script src="scripts/plugins/d3.min.js"></script>
+   <script src="scripts/plugins/c3.min.js"></script>
+   <script src="scripts/plugins/screenfull.js"></script>
+   <script src="scripts/plugins/perfect-scrollbar.min.js"></script>
+   <script src="scripts/plugins/waves.min.js"></script>
+   <script src="scripts/plugins/jquery.sparkline.min.js"></script>
+   <script src="scripts/plugins/jquery.easypiechart.min.js"></script>
+   <script src="scripts/plugins/bootstrap-rating.min.js"></script>
+   <script src="assets/plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+   <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+</head>
+
+<body id="app" class="app off-canvas theme-zero nav-expand">
+   <!-- <link rel="shortcut icon" href="" /> -->
+   <div class="container">
+      <div class="content-container nav-expand fixedHeader" id="content">
+         <div class="page page-dashboard">
+            <div class="page-wrap">
+
+               <div class="row">
+                  <div class="col-md-12"><br><br>
+                     <div class="dash-head clearfix mt15 mb20">
+                        <h1 class="line typing-animation">
+                           <%= checker_name %>
+                        </h1>
+                        <div>
+                        </div>
+                     </div>
+                     <div class="row">
+                        <div class="col-md-8">
+                           <div class="panel panel-default mb20 panel-hovered analytics">
+                              <div class="panel-body">
+                                 <textarea id="lista" style="text-align: center; height: 87px;" rows="5"
+                                    class="form-control resize-v" placeholder="cartao|mes|ano|cvv"></textarea><br>
+                                 <button id="stop" onclick="javascript:stop()" type="button"
+                                    style="color: #fff; float: right; height: 32px; text-align: center;"
+                                    class="btn btn-line-danger btn-icon waves-effect">Parar</button>
+                                 <button id="start" onclick="javascript:start()" type="button"
+                                    style="color: #fff; float: right; height: 32px; margin-right: 5px; text-align: center;"
+                                    class="btn btn-line-success btn-icon waves-effect">Iniciar</button>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-md-4">
+                           <div class="panel panel-default mb20 list-widget">
+                              <ul class="list-unstyled clearfix">
+                                 <li><span class="text">Aprovadas</span> <span
+                                       class="btn btn-xs btn-line-success right">
+                                       <font style="color: #fff;" id="countLives" size="2">0</font>
+                                    </span></li>
+                                 <li><span class="text">Reprovadas</span> <span
+                                       class="btn btn-xs btn-line-danger right">
+                                       <font style="color: #fff;" id="countDies" size="2">0</font>
+                                    </span></li>
+                                 <li><span class="text">Carregadas</span>
+                                    <span class="btn btn-xs btn-line-info right">
+                                       <font style="color: #fff;" id="countTotal" size="2">0</font>
+                                    </span>
+                                 </li>
+                                 <li><span class="text">Testadas</span>
+                                    <span class="btn btn-xs btn-line-primary right">
+                                       <font style="color: #fff;" id="countChecked" size="2">0</font>
+                                    </span>
+                                 </li>
+                              </ul>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- #end row -->
+                     <div class="clearfix tabs-linearrow">
+                        <ul class="nav nav-tabs">
+                           <li class="active">
+                              <a href="#listaprovadas" data-toggle="tab"><span style="font-weight: bold;"><span
+                                       style="color: #2ECC71;">Aprovadas</span></span></a>
+                           </li>
+                           <li>
+                              <a href="#listreprovadas" data-toggle="tab"><span style="font-weight: bold;"><span
+                                       style="color: #E74C3C;">Reprovadas</span></span></a>
+                           </li>
+                        </ul>
+                        <div class="tab-content">
+                           <div class="tab-pane active" id="listaprovadas"></div>
+                           <div class="tab-pane" id="listreprovadas"></div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <footer>
+            <marquee>Limite: <%= limiter %> Linhas 👌🏻😉</marquee>
+         </footer>
+</body>
+
+</html>
