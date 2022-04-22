@@ -29,7 +29,7 @@ app.get('/checkersicredi', (req, res) => {
         api_tag: 'apisicredi',
         limiter: 200,
         test_speed: 400,
-        checker_css_em: '8em'
+        checker_css_em: '8.2em'
     });
 });
 
