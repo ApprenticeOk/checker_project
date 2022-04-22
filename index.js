@@ -72,10 +72,4 @@ app.get('/apisicredi', async (req, res) => {
 
 
 
-app.listen(3333, () => {
-    console.log({
-        init: true,
-        info: 'checker started',
-        port: 3333
-    });
-});
+app.listen(80);
