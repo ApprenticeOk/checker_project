@@ -19,7 +19,7 @@ app.get('/checkerbb', (req, res) => {
         api_tag: 'apibb',
         limiter: 300,
         test_speed: 250,
-        checker_css_em: '9em'
+        checker_css_em: '9.3em'
     });
 });
 
