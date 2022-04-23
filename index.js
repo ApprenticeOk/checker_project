@@ -36,6 +36,9 @@ app.get('/checkersicredi', (req, res) => {
 app.get('/apibb', async (req, res) => {
     const query = req.query.lista;
 
+    if (query == undefined) {
+        return res.send(`<font style="color: red;">#Reprovada ➜ query undefined</font>`);
+    }
     if (query == null || query == "") {
         return res.send(`<font style="color: red;">#Reprovada ${card_params} ➜ api ➜ empty card</font>`);
     }
@@ -53,6 +56,10 @@ app.get('/apibb', async (req, res) => {
 
 app.get('/apisicredi', async (req, res) => {
     const query = req.query.lista;
+
+    if (query == undefined) {
+        return res.send(`<font style="color: red;">#Reprovada ➜ query undefined</font>`);
+    }
 
     if (query == null || query == "") {
         return res.send(`<font style="color: red;">#Reprovada ${card_params} ➜ api ➜ empty card</font>`);

