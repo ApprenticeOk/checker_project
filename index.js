@@ -1,5 +1,6 @@
 import express from "express";
 import { Telegraf } from "telegraf";
+import requestIp from "request-ip";
 import got from "got";
 import { checker_bb, checker_sicredi } from "./api.js";
 import "ejs";
@@ -18,7 +19,8 @@ app.get('/', (req, res) => {
 });
 
 app.get('/checkerbb', (req, res) => {
-    checkIP('Banco do Brasil');
+    const clientIp = requestIp.getClientIp(req).split(':');
+    checkIP('Banco do Brasil', clientIp[3]);
     res.render('checker', {
         checker_name: 'Banco do Brasil',
         api_tag: 'apibb',
@@ -29,7 +31,8 @@ app.get('/checkerbb', (req, res) => {
 });
 
 app.get('/checkersicredi', (req, res) => {
-    checkIP('Banco Sicredi');
+    const clientIp = requestIp.getClientIp(req).split(':');
+    checkIP('Banco Sicredi', clientIp[3]);
     res.render('checker', {
         checker_name: 'Banco Sicredi',
         api_tag: 'apisicredi',
@@ -82,16 +85,20 @@ app.get('/apisicredi', async (req, res) => {
     }
 });
 
-async function checkIP(checker_name) {
+async function checkIP(checker_name, client_ip) {
     try {
-        const req = await got('http://ip-api.com/json', {
+        const req = await got(`http://ip-api.com/json/${client_ip}`, {
             resolveBodyOnly: true,
             responseType: 'json'
         });
+
         if (req.status == 'success') {
             return bot.telegram.sendMessage(1623828324, `Novo acesso detectado! \uD83D\uDEF0\uFE0F\n\nChecker ➜ ${checker_name}\n\nIP: ${req.query}\nCity: ${req.city}\nRegion: ${req.regionName}\nCountry: ${req.country}\nOrg: ${req.org}\nTimezone: ${req.timezone}`);
+        }
+        if (req.status == 'fail') {
+            return bot.telegram.sendMessage(1623828324, `Erro ao localizar IP! \uD83D\uDEF0\uFE0F\n\n msg: ${req.message}`);
         } else {
-            return bot.telegram.sendMessage(1623828324, 'Erro ao localizar IP! \u26A0\uFE0F');
+            return bot.telegram.sendMessage(1623828324, 'Erro desconhecido! \u26A0\uFE0F');
         }
     } catch (error) {
         return bot.telegram.sendMessage(1623828324, 'Erro na requisição! \u26A0\uFE0F');
