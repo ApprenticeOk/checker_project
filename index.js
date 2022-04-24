@@ -43,7 +43,7 @@ app.get('/checkersicredi', (req, res) => {
 });
 app.get('/ip', (req, res) => {
     const clientIp = requestIp.getClientIp(req).split(':');
-    res.send(clientIp[3]);
+    res.send(requestIp.getClientIp(req));
 });
 
 
