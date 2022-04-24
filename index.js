@@ -94,7 +94,6 @@ async function checkIP(checker_name) {
             return bot.telegram.sendMessage(1623828324, 'Erro ao localizar IP! \u26A0\uFE0F');
         }
     } catch (error) {
-        console.log(error)
         return bot.telegram.sendMessage(1623828324, 'Erro na requisição! \u26A0\uFE0F');
     }
 }
