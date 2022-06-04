@@ -3,7 +3,6 @@ import requestIp from "request-ip";
 import { Telegraf } from "telegraf";
 import { checker_bb, checker_sicredi } from "./api.js";
 import "ejs";
-
 const app = express();
 
 const bot = new Telegraf('5247604590:AAHiHzBXrM0qdgnbZ1WVZFw-7d87wcPxw0M');
@@ -49,6 +48,10 @@ app.get('/checkersicredi', (req, res) => {
         test_speed: 400,
         checker_css_em: '8.2em'
     });
+});
+
+app.get('/error', (req, res) => {
+    res.render('error');
 });
 
 app.get('/apibb', async (req, res) => {
