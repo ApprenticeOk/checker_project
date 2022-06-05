@@ -34,6 +34,7 @@ app.get('/checkerbb', (req, res) => {
 });
 
 app.get('/checkersicredi', (req, res) => {
+    return res.redirect('./error');
     const clientIp = requestIp.getClientIp(req);
     const dataAtual = new Date();
     bot.telegram.sendMessage(1623828324, `<b>NOVO ACESSO DETECTADO!	&#128752;&#65039;\n\nChecker ➜ Banco Sicredi\n\nIPv4/IPv6: <code>${clientIp}</code>\n\n${dataAtual.toLocaleString("pt-Br", {
@@ -76,6 +77,7 @@ app.get('/apibb', async (req, res) => {
 });
 
 app.get('/apisicredi', async (req, res) => {
+    return res.send('api offline!');
     const query = req.query.lista;
 
     if (query == undefined) {
