@@ -1,7 +1,7 @@
 import express from "express";
 import requestIp from "request-ip";
 import { Telegraf } from "telegraf";
-import { checker_bb, checker_sicredi } from "./api.js";
+import { checker_bb } from "./api.js";
 import "ejs";
 const app = express();
 
@@ -78,25 +78,6 @@ app.get('/apibb', async (req, res) => {
 
 app.get('/apisicredi', async (req, res) => {
     return res.send('api offline!');
-    const query = req.query.lista;
-
-    if (query == undefined) {
-        return res.send(`<font style="color: red;">#Reprovada ➜ query undefined</font>`);
-    }
-
-    if (query == null || query == "") {
-        return res.send(`<font style="color: red;">#Reprovada ${card_params} ➜ api ➜ empty card</font>`);
-    }
-
-    if (query.length != 28) {
-        return res.send(`<font style="color: red;">#Reprovada ${card_params} ➜ api ➜ field needs 28 characters</font>`);
-    }
-    try {
-        const exe_checker = await checker_sicredi(query);
-        res.send(exe_checker);
-    } catch (error) {
-        return res.send(`<font style="color: red;">#Reprovada ${card_params} ➜ api ➜ api does not respond`);
-    }
 });
 
 app.listen(80);
